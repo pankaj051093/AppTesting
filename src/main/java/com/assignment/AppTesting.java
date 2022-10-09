@@ -2,12 +2,13 @@ package com.assignment;
 
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
+import com.pages.ImdbPage;
 import com.utils.UtilsFile;
 import com.utils.webDriverUtil;
 
@@ -15,6 +16,7 @@ public class AppTesting {
 
 	WebDriver driver;
 	Properties prop;
+	ImdbPage imdb;
 
 	@BeforeClass
 	public void loadPropertyFile() {
@@ -28,21 +30,24 @@ public class AppTesting {
 	@Test
 	public void test() {
 
+		imdb = new ImdbPage(driver);
+
 		String movieName = prop.getProperty("movieName");
-		driver.get(prop.getProperty("imdb"));
+		
+		driver.get(prop.getProperty("wikipedia"));
 		driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
-
-		String searchIcon = prop.getProperty("searchIcon").replace("movieName", movieName);
-		driver.findElement(By.xpath(prop.getProperty("inputBox"))).sendKeys(movieName);
-		driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
-		driver.findElement(By.xpath(searchIcon)).click();
-
+		
+		imdb.searchMovieName(movieName);
 		driver.manage().timeouts().implicitlyWait(3, TimeUnit.SECONDS);
-		String ReleaseDate = driver.findElement(By.xpath(prop.getProperty("ReleaseDate"))).getText();
-		String Country = driver.findElement(By.xpath(prop.getProperty("Country"))).getText();
 
-		Assert.assertEquals(Country, "India");
-		System.out.println(ReleaseDate + " --- " + Country);
+		imdb.searchIcon(movieName);
+		driver.manage().timeouts().implicitlyWait(3, TimeUnit.SECONDS);
+
+		imdb.getReleaseDate();
+		imdb.getCountry();
+
+		Assert.assertEquals(imdb.getCountry(), "India");
+		System.out.println(imdb.getReleaseDate() + " --- " + imdb.getCountry());
 
 	}
 
